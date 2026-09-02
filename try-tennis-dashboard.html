@@ -593,7 +593,7 @@ async function loadData(){
     const text = await res.text();
     const parsed = parseCSV(text);
     if(!parsed.data || !parsed.data.length) throw new Error("empty CSV");
-    applyParsed(parsed.data, `Live — from ${CSV_URL}`);
+    applyParsed(parsed.data, ``);
   } catch(err){
     if(typeof console !== "undefined" && console.log) console.log("No live CSV reachable, using embedded data:", err.message);
   }
