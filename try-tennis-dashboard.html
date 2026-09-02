@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Try Tennis NC — Program Dashboard (Sample Layout)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#16323F;
+    --court:#2C6E7F;
+    --court-deep:#194C57;
+    --chalk:#F6F5F0;
+    --panel:#FFFFFF;
+    --line:#DDE2E1;
+    --ink:#1B2B2E;
+    --ink-soft:#5B6D6F;
+    --ball:#C7D93B;
+    --ball-deep:#98A62A;
+    --up:#3F8A5B;
+    --down:#B85C3E;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--chalk);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:32px 24px 80px;}
+
+  header.page{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:24px;
+    border-bottom:2px solid var(--navy);
+    padding-bottom:18px;
+    margin-bottom:22px;
+  }
+  header.page h1{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:700;
+    font-size:28px;
+    margin:0 0 4px;
+    color:var(--navy);
+    letter-spacing:-0.01em;
+  }
+  header.page p{margin:0;color:var(--ink-soft);font-size:14px;max-width:46ch;}
+  .as-of{
+    font-size:12px;
+    color:var(--ink-soft);
+    text-align:right;
+    line-height:1.5;
+    white-space:nowrap;
+  }
+  .as-of strong{color:var(--ink);display:block;font-size:13px;}
+
+  /* Program type summary-card grid */
+  .type-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:12px;
+    margin-bottom:28px;
+  }
+  .type-card{
+    background:var(--panel);
+    border:1.5px solid var(--line);
+    border-radius:var(--radius);
+    padding:14px 16px;
+    text-align:left;
+    cursor:pointer;
+    font-family:'Inter',sans-serif;
+    transition:border-color .15s, box-shadow .15s, background .15s;
+  }
+  .type-card:hover{border-color:var(--court);}
+  .type-card.active{
+    border-color:var(--navy);
+    background:var(--navy);
+  }
+  .type-card .t-label{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:600;
+    font-size:13px;
+    color:var(--ink);
+    margin-bottom:10px;
+  }
+  .type-card.active .t-label{color:#fff;}
+  .type-card .t-value{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:700;
+    font-size:20px;
+    color:var(--navy);
+    font-variant-numeric:tabular-nums;
+  }
+  .type-card.active .t-value{color:var(--ball);}
+  .type-card .t-sub{font-size:11px;color:var(--ink-soft);margin-top:2px;}
+  .type-card.active .t-sub{color:#B9C8CC;}
+  .type-card .t-delta{font-size:11.5px;font-weight:600;margin-top:8px;}
+  .type-card .t-delta.up{color:var(--up);}
+  .type-card .t-delta.down{color:var(--down);}
+  .type-card.active .t-delta.up{color:#8FD9A6;}
+  .type-card.active .t-delta.down{color:#E8A98D;}
+  .type-card .t-hint{
+    font-size:10.5px;
+    color:var(--ink-soft);
+    margin-top:10px;
+    text-transform:none;
+  }
+  .type-card.active .t-hint{color:#B9C8CC;}
+
+  .detail-panel{
+    border-top:2px solid var(--navy);
+    padding-top:22px;
+  }
+
+  /* KPI row */
+  .kpis{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:14px;
+    margin-bottom:26px;
+  }
+  .kpi{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px 18px;
+  }
+  .kpi .label{font-size:12.5px;color:var(--ink-soft);margin-bottom:8px;}
+  .kpi .value{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:26px;
+    font-weight:700;
+    color:var(--navy);
+    font-variant-numeric:tabular-nums;
+  }
+  .kpi .delta{font-size:12.5px;margin-top:4px;font-weight:600;}
+  .kpi .delta.up{color:var(--up);}
+  .kpi .delta.down{color:var(--down);}
+
+  /* Section headings */
+  .section-title{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:600;
+    font-size:15px;
+    color:var(--navy);
+    margin:0 0 12px;
+  }
+  .section-note{font-size:12.5px;color:var(--ink-soft);margin:-6px 0 14px;}
+
+  /* Charts */
+  .chart-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+    margin-bottom:28px;
+  }
+  .chart-card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:18px 18px 8px;
+  }
+  .chart-card h3{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:14px;
+    font-weight:600;
+    margin:0 0 2px;
+    color:var(--ink);
+  }
+  .chart-card .hint{font-size:11.5px;color:var(--ink-soft);margin-bottom:8px;}
+  .chart-holder{height:250px;position:relative;}
+  .chart-holder svg{width:100%;height:100%;overflow:visible;}
+  .chart-line{fill:none;}
+  .chart-point{cursor:pointer;}
+  .chart-legend{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin-top:10px;
+    padding-top:10px;
+    border-top:1px solid var(--line);
+  }
+  .legend-chip{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    font-family:'Inter',sans-serif;
+    font-size:11.5px;
+    font-weight:600;
+    padding:4px 9px;
+    border-radius:999px;
+    border:1.5px solid var(--line);
+    background:var(--panel);
+    color:var(--ink-soft);
+    cursor:pointer;
+    user-select:none;
+    transition:opacity .15s, border-color .15s;
+  }
+  .legend-chip .swatch{width:9px;height:9px;border-radius:2px;flex:none;}
+  .legend-chip.off{opacity:0.4;}
+  .legend-chip:hover{border-color:var(--court);}
+
+  /* Table */
+  .table-card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:18px;
+    margin-bottom:36px;
+    overflow-x:auto;
+  }
+  .table-head-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:12px;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .metric-toggle{
+    display:inline-flex;
+    border:1.5px solid var(--line);
+    border-radius:999px;
+    overflow:hidden;
+  }
+  .metric-toggle button{
+    border:none;
+    background:var(--panel);
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:12.5px;
+    padding:7px 14px;
+    color:var(--ink-soft);
+    cursor:pointer;
+  }
+  .metric-toggle button.active{background:var(--court);color:#fff;}
+
+  table{border-collapse:collapse;width:100%;font-size:13px;min-width:760px;}
+  thead th{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:600;
+    font-size:12px;
+    text-align:right;
+    color:var(--ink-soft);
+    padding:6px 10px;
+    border-bottom:1.5px solid var(--navy);
+    font-variant-numeric:tabular-nums;
+  }
+  thead th:first-child{text-align:left;}
+  tbody td{
+    text-align:right;
+    padding:6px 10px;
+    border-bottom:1px solid var(--line);
+    font-variant-numeric:tabular-nums;
+    color:var(--ink);
+  }
+  tbody td:first-child{
+    text-align:left;
+    font-weight:600;
+    color:var(--navy);
+  }
+  tbody tr:hover td{background:#F1F6F5;}
+  tfoot td{
+    text-align:right;
+    padding:8px 10px;
+    font-weight:700;
+    color:var(--navy);
+    border-top:1.5px solid var(--navy);
+    font-variant-numeric:tabular-nums;
+  }
+  tfoot td:first-child{text-align:left;}
+
+  .legend-note{
+    font-size:11.5px;
+    color:var(--ink-soft);
+    margin-top:10px;
+  }
+  .legend-note .dot{display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--ball-deep);margin-right:5px;}
+
+  footer{
+    margin-top:10px;
+    font-size:12px;
+    color:var(--ink-soft);
+    border-top:1px solid var(--line);
+    padding-top:16px;
+  }
+
+  @media (max-width:980px){
+    .type-grid{grid-template-columns:repeat(3,1fr);}
+  }
+  @media (max-width:760px){
+    .kpis{grid-template-columns:repeat(2,1fr);}
+    .chart-grid{grid-template-columns:1fr;}
+    .type-grid{grid-template-columns:repeat(2,1fr);}
+    header.page{flex-direction:column;align-items:flex-start;}
+    .as-of{text-align:left;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="page">
+    <div>
+      <h1>Try Tennis NC — Program Dashboard</h1>
+      <p>Monthly programs and registrations by pathway, 2017 to present. Sample layout with illustrative data.</p>
+    </div>
+    <div class="as-of" id="asOf">
+      <strong>Loading data…</strong>
+      &nbsp;
+    </div>
+  </header>
+
+  <div class="section-title" style="margin-bottom:4px;">Program types</div>
+  <div class="section-note">Click a card to open its detail below — charts, and monthly table.</div>
+  <div class="type-grid" id="typeGrid"></div>
+
+  <div class="detail-panel">
+    <div class="kpis" id="kpis"></div>
+
+    <div class="section-title">Registrations by month, compared across years</div>
+    <div class="section-note">Each line is one year. The last 3 years are shown by default — click a year in the legend to add or remove it.</div>
+    <div class="chart-grid">
+      <div class="chart-card" style="grid-column:1 / -1;">
+        <h3 id="regChartTitle">Registrations</h3>
+        <div class="hint">Total players registered per month</div>
+        <div class="chart-holder"><svg id="regChart"></svg></div>
+        <div class="chart-legend" id="regLegend"></div>
+      </div>
+    </div>
+
+    <div class="section-title">Programs run by month, compared across years</div>
+    <div class="section-note">Same view, for number of programs offered rather than registrations.</div>
+    <div class="chart-grid">
+      <div class="chart-card" style="grid-column:1 / -1;">
+        <h3 id="progChartTitle">Programs</h3>
+        <div class="hint">Number of distinct programs held per month</div>
+        <div class="chart-holder"><svg id="progChart"></svg></div>
+        <div class="chart-legend" id="progLegend"></div>
+      </div>
+    </div>
+
+    <div class="table-card">
+      <div class="table-head-row">
+        <div class="section-title" style="margin:0;" id="tableTitle">Monthly detail — Registrations</div>
+        <div class="metric-toggle">
+          <button id="btnReg" class="active">Registrations</button>
+          <button id="btnProg">Programs</button>
+        </div>
+      </div>
+      <table id="dataTable">
+        <thead><tr id="tableHeadRow"></tr></thead>
+        <tbody id="tableBody"></tbody>
+        <tfoot><tr id="tableFootRow"></tr></tfoot>
+      </table>
+      <div class="legend-note"><span class="dot"></span>Totals column and row shown in bold for quick scanning.</div>
+    </div>
+  </div>
+
+  <footer>
+    Sample layout only — replace the mock dataset with your 2017–present export. Each program type (Adult Try Tennis, Junior Try Tennis, Adult Try Play, Adult Try Match) uses this same card, chart, and table pattern so the audience only has to learn the layout once.
+  </footer>
+
+</div>
+
+<script>
+/* ---------- data source ---------- */
+// Point this at your published data. Two options:
+//  1) A CSV sitting next to this HTML file (e.g. exported from
+//     process_serve_tennis_export.py) — the default below.
+//  2) A Google Sheet published as CSV: File > Share > Publish to web > CSV,
+//     then paste that URL here instead.
+// Expected columns: type_key,year,month,programs,registrations
+// type_key values: adult_tt, junior_tt, adult_tp, adult_tm
+const CSV_URL = "master_program_data.csv";
+
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+let CURRENT_YEAR = 2026;
+let CURRENT_MONTH_IDX = 7; // 0-indexed; overwritten once real data loads
+
+const PROGRAM_TYPES = [
+  { key:"adult_tt",  label:"Adult Try Tennis" },
+  { key:"junior_tt", label:"Junior Try Tennis" },
+  { key:"adult_tp",  label:"Adult Try Play" },
+  { key:"adult_tm",  label:"Adult Try Match" },
+];
+
+// Real data as of this export, baked in directly so the dashboard renders
+// correctly even when opened as a local file or previewed (fetch() of a
+// sibling CSV can silently fail outside a real web server). If CSV_URL is
+// reachable — e.g. once this is hosted alongside master_program_data.csv,
+// or pointed at a published Google Sheet — that live copy is used instead.
+const EMBEDDED_CSV = `type_key,year,month,programs,registrations
+adult_tm,2024,2,1,8
+adult_tm,2024,3,1,8
+adult_tm,2024,4,1,7
+adult_tm,2024,5,2,15
+adult_tm,2024,6,1,10
+adult_tm,2024,7,1,10
+adult_tm,2024,8,1,18
+adult_tm,2024,9,5,48
+adult_tm,2024,10,3,26
+adult_tm,2024,11,3,37
+adult_tm,2024,12,1,12
+adult_tm,2025,3,1,10
+adult_tm,2025,4,2,15
+adult_tm,2025,6,2,23
+adult_tm,2025,7,3,40
+adult_tm,2025,9,3,27
+adult_tm,2025,10,2,21
+adult_tm,2025,11,3,17
+adult_tm,2026,1,2,26
+adult_tm,2026,3,2,21
+adult_tm,2026,4,3,21
+adult_tm,2026,5,4,45
+adult_tm,2026,6,1,12
+adult_tm,2026,7,2,25
+adult_tm,2026,8,3,38
+adult_tp,2024,1,2,17
+adult_tp,2024,2,4,30
+adult_tp,2024,3,6,54
+adult_tp,2024,4,11,101
+adult_tp,2024,5,8,57
+adult_tp,2024,6,9,81
+adult_tp,2024,7,12,101
+adult_tp,2024,8,4,39
+adult_tp,2024,9,10,91
+adult_tp,2024,10,14,106
+adult_tp,2024,11,3,29
+adult_tp,2024,12,3,22
+adult_tp,2025,1,1,7
+adult_tp,2025,2,2,16
+adult_tp,2025,3,7,67
+adult_tp,2025,4,5,48
+adult_tp,2025,5,7,56
+adult_tp,2025,6,6,62
+adult_tp,2025,7,9,76
+adult_tp,2025,8,4,35
+adult_tp,2025,9,11,101
+adult_tp,2025,10,11,92
+adult_tp,2025,11,4,36
+adult_tp,2025,12,1,8
+adult_tp,2026,1,6,57
+adult_tp,2026,2,2,19
+adult_tp,2026,3,9,76
+adult_tp,2026,4,7,69
+adult_tp,2026,5,4,47
+adult_tp,2026,6,8,87
+adult_tp,2026,7,8,69
+adult_tp,2026,8,8,69
+adult_tt,2024,1,3,24
+adult_tt,2024,2,3,25
+adult_tt,2024,3,21,237
+adult_tt,2024,4,30,257
+adult_tt,2024,5,19,174
+adult_tt,2024,6,23,208
+adult_tt,2024,7,15,154
+adult_tt,2024,8,10,106
+adult_tt,2024,9,30,294
+adult_tt,2024,10,16,139
+adult_tt,2024,11,7,62
+adult_tt,2024,12,1,5
+adult_tt,2025,1,5,35
+adult_tt,2025,2,7,49
+adult_tt,2025,3,22,216
+adult_tt,2025,4,19,208
+adult_tt,2025,5,16,158
+adult_tt,2025,6,19,183
+adult_tt,2025,7,11,133
+adult_tt,2025,8,10,112
+adult_tt,2025,9,20,218
+adult_tt,2025,10,16,160
+adult_tt,2025,11,6,47
+adult_tt,2025,12,2,11
+adult_tt,2026,1,7,76
+adult_tt,2026,2,6,61
+adult_tt,2026,3,18,178
+adult_tt,2026,4,21,236
+adult_tt,2026,5,14,138
+adult_tt,2026,6,18,184
+adult_tt,2026,7,17,166
+adult_tt,2026,8,11,118
+junior_tt,2024,2,3,20
+junior_tt,2024,3,11,103
+junior_tt,2024,4,13,116
+junior_tt,2024,5,14,152
+junior_tt,2024,6,13,118
+junior_tt,2024,7,16,136
+junior_tt,2024,8,5,43
+junior_tt,2024,9,14,115
+junior_tt,2024,10,7,56
+junior_tt,2024,11,4,20
+junior_tt,2024,12,1,4
+junior_tt,2025,1,4,19
+junior_tt,2025,2,2,16
+junior_tt,2025,3,14,126
+junior_tt,2025,4,6,57
+junior_tt,2025,5,8,73
+junior_tt,2025,6,16,122
+junior_tt,2025,7,10,95
+junior_tt,2025,8,7,73
+junior_tt,2025,9,8,82
+junior_tt,2025,10,10,77
+junior_tt,2025,11,3,21
+junior_tt,2025,12,2,9
+junior_tt,2026,1,4,32
+junior_tt,2026,2,1,5
+junior_tt,2026,3,13,123
+junior_tt,2026,4,7,49
+junior_tt,2026,5,9,67
+junior_tt,2026,6,15,143
+junior_tt,2026,7,9,69
+junior_tt,2026,8,8,74`;
+
+let DATA = {};
+
+/* ---------- tiny built-in CSV parser ----------
+   No external dependency, so a blocked/slow CDN script can't take the
+   whole dashboard down with it. Fine for our plain numeric/id columns
+   (no embedded commas or quotes to worry about). */
+function parseCSV(text){
+  const lines = text.trim().split(/\r?\n/).filter(l => l.length);
+  if(!lines.length) return { data: [] };
+  const headers = lines[0].split(",").map(h => h.trim());
+  const data = lines.slice(1).map(line => {
+    const cells = line.split(",");
+    const row = {};
+    headers.forEach((h, i) => { row[h] = (cells[i] || "").trim(); });
+    return row;
+  });
+  return { data };
+}
+
+/* ---------- CSV -> dashboard data structure (shared by embedded data and live fetch) ---------- */
+const VALID_KEYS = new Set(PROGRAM_TYPES.map(p => p.key));
+
+function parseCSVToData(rows){
+  // rows: array of {type_key, year, month, programs, registrations}
+  const out = {};
+  let latestYear = null, latestMonth = null; // month is 1-12 here
+  rows.forEach(row => {
+    const key = (row.type_key || "").trim();
+    if(!VALID_KEYS.has(key)) return;
+    const year = parseInt(row.year, 10);
+    const month = parseInt(row.month, 10); // 1-12
+    const programs = parseFloat(row.programs);
+    const registrations = parseFloat(row.registrations);
+    if(!year || !month || month < 1 || month > 12) return;
+
+    if(!out[key]) out[key] = {};
+    if(!out[key][year]) out[key][year] = { programs: Array(12).fill(null), registrations: Array(12).fill(null) };
+    out[key][year].programs[month-1] = isNaN(programs) ? 0 : programs;
+    out[key][year].registrations[month-1] = isNaN(registrations) ? 0 : registrations;
+
+    if(latestYear == null || year > latestYear || (year === latestYear && month > latestMonth)){
+      latestYear = year; latestMonth = month;
+    }
+  });
+  // fill in any program types with no rows yet, so the layout still renders
+  PROGRAM_TYPES.forEach(cfg => { if(!out[cfg.key]) out[cfg.key] = {}; });
+  return { data: out, latestYear, latestMonth };
+}
+
+function applyParsed(parsedRows, sourceLabel){
+  const { data, latestYear, latestMonth } = parseCSVToData(parsedRows);
+  DATA = data;
+  if(latestYear){
+    CURRENT_YEAR = latestYear;
+    CURRENT_MONTH_IDX = latestMonth - 1;
+    setAsOf(`<strong>Data through ${MONTHS[CURRENT_MONTH_IDX]} ${CURRENT_YEAR}</strong>${sourceLabel}`);
+  } else {
+    setAsOf(`<strong>${sourceLabel} loaded, but no rows matched</strong>Check type_key / year / month columns`);
+  }
+}
+
+function setAsOf(html){
+  document.getElementById("asOf").innerHTML = html;
+}
+
+async function loadData(){
+  // start from the embedded snapshot so the dashboard is correct immediately
+  const embedded = parseCSV(EMBEDDED_CSV);
+  applyParsed(embedded.data, "Embedded copy, updated with each export");
+
+  // then try to override with a live CSV, if one is reachable
+  try{
+    const res = await fetch(CSV_URL, { cache: "no-store" });
+    if(!res.ok) throw new Error(`fetch failed: ${res.status}`);
+    const text = await res.text();
+    const parsed = parseCSV(text);
+    if(!parsed.data || !parsed.data.length) throw new Error("empty CSV");
+    applyParsed(parsed.data, `Live — from ${CSV_URL}`);
+  } catch(err){
+    if(typeof console !== "undefined" && console.log) console.log("No live CSV reachable, using embedded data:", err.message);
+  }
+  render();
+}
+
+/* ---------- colour ramp: older years light, current year deep navy/ball ---------- */
+function yearColor(year, years){
+  const idx = years.indexOf(year);
+  const t = idx / Math.max(1, years.length - 1); // 0 = oldest, 1 = newest
+  const isCurrent = year === CURRENT_YEAR;
+  if(isCurrent) return { border:"#C7D93B", bg:"rgba(199,217,59,0.15)", width:3 };
+  // interpolate a blue ramp from light to deep
+  const light = [186,214,220], deep = [22,50,63];
+  const c = light.map((v,i) => Math.round(v + (deep[i]-v)*t));
+  return { border:`rgb(${c[0]},${c[1]},${c[2]})`, bg:"transparent", width:1.75 };
+}
+
+/* ---------- state ---------- */
+let activeType = PROGRAM_TYPES[0].key;
+let activeMetric = "registrations"; // or "programs"
+
+/* ---------- summary card grid ---------- */
+const gridEl = document.getElementById("typeGrid");
+function renderTypeGrid(){
+  gridEl.innerHTML = "";
+  PROGRAM_TYPES.forEach(cfg => {
+    const k = computeKPIs(cfg.key);
+    const deltaClass = k.pct == null ? "" : (k.pct >= 0 ? "up" : "down");
+    const deltaText = k.pct == null ? "New program" : `${k.pct >= 0 ? "+" : ""}${k.pct}% YTD vs last yr`;
+    const card = document.createElement("button");
+    card.className = "type-card" + (cfg.key === activeType ? " active" : "");
+    card.dataset.key = cfg.key;
+    card.innerHTML = `
+      <div class="t-label">${cfg.label}</div>
+      <div class="t-value">${k.ytdReg.toLocaleString()}</div>
+      <div class="t-sub">registrations in ${CURRENT_YEAR}</div>
+      <div class="t-delta ${deltaClass}">${deltaText}</div>
+      <div class="t-hint">Click for totals since ${k.firstYear} and monthly detail</div>
+    `;
+    card.onclick = () => { activeType = cfg.key; render(); };
+    gridEl.appendChild(card);
+  });
+}
+
+/* ---------- KPI cards ---------- */
+function computeKPIs(key){
+  const yearData = DATA[key];
+  const years = Object.keys(yearData).map(Number).sort((a,b)=>a-b);
+  let totalProg = 0, totalReg = 0;
+  years.forEach(y=>{
+    yearData[y].programs.forEach(v=>{ if(v!=null) totalProg += v; });
+    yearData[y].registrations.forEach(v=>{ if(v!=null) totalReg += v; });
+  });
+  const thisYear = yearData[CURRENT_YEAR];
+  const lastYear = yearData[CURRENT_YEAR-1];
+  function sumThrough(arr, upTo){ return arr.slice(0, upTo+1).reduce((a,v)=>a+(v||0),0); }
+  const ytdReg = thisYear ? sumThrough(thisYear.registrations, CURRENT_MONTH_IDX) : 0;
+  const pyReg  = lastYear ? sumThrough(lastYear.registrations, CURRENT_MONTH_IDX) : null;
+  const pct = pyReg ? Math.round(((ytdReg - pyReg)/pyReg)*100) : null;
+  const avgPerProgram = totalProg ? Math.round(totalReg/totalProg) : 0;
+  return { totalProg, totalReg, ytdReg, pct, avgPerProgram, firstYear: years[0] || CURRENT_YEAR };
+}
+
+function renderKPIs(key){
+  const k = computeKPIs(key);
+  const el = document.getElementById("kpis");
+  const deltaClass = k.pct == null ? "" : (k.pct >= 0 ? "up" : "down");
+  const deltaText = k.pct == null ? "No prior-year comparison" : `${k.pct >= 0 ? "+" : ""}${k.pct}% vs same period last year`;
+  el.innerHTML = `
+    <div class="kpi"><div class="label">Total registrations (${k.firstYear}–present)</div><div class="value">${k.totalReg.toLocaleString()}</div></div>
+    <div class="kpi"><div class="label">Total programs run (${k.firstYear}–present)</div><div class="value">${k.totalProg.toLocaleString()}</div></div>
+    <div class="kpi"><div class="label">Registrations, year to date</div><div class="value">${k.ytdReg.toLocaleString()}</div><div class="delta ${deltaClass}">${deltaText}</div></div>
+    <div class="kpi"><div class="label">Avg. registrations per program</div><div class="value">${k.avgPerProgram}</div></div>
+  `;
+}
+
+/* ---------- charts (hand-built SVG — no external charting library) ---------- */
+const chartHidden = { reg: new Set(), prog: new Set() }; // years hidden per chart, by user toggle
+
+function buildSeries(key, metric){
+  const yearData = DATA[key];
+  const years = Object.keys(yearData).map(Number).sort((a,b)=>a-b);
+  return years.map(y => ({
+    year: y,
+    data: yearData[y][metric],
+    color: yearColor(y, years),
+  }));
+}
+
+function drawLineChart(svgEl, legendEl, series, hiddenSet, chartKey){
+  const W = 900, H = 260;
+  const padL = 44, padR = 12, padT = 12, padB = 26;
+  const plotW = W - padL - padR, plotH = H - padT - padB;
+
+  // default visibility: most recent 3 years, unless the user has toggled something already
+  if(hiddenSet.size === 0 && series.length > 3){
+    series.slice(0, series.length - 3).forEach(s => hiddenSet.add(s.year));
+  }
+
+  const visible = series.filter(s => !hiddenSet.has(s.year));
+  let yMax = 1;
+  series.forEach(s => s.data.forEach(v => { if(v != null && v > yMax) yMax = v; }));
+  yMax = Math.ceil(yMax * 1.1);
+
+  const xFor = i => padL + (i / 11) * plotW;
+  const yFor = v => padT + plotH - (v / yMax) * plotH;
+
+  const gridLines = 4;
+  let gridSvg = "";
+  for(let g = 0; g <= gridLines; g++){
+    const val = Math.round((yMax / gridLines) * g);
+    const y = yFor(val);
+    gridSvg += `<line x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}" stroke="#EDEFEE" stroke-width="1"/>`;
+    gridSvg += `<text x="${padL-8}" y="${y+3}" text-anchor="end" font-size="10.5" font-family="Inter" fill="#5B6D6F">${val}</text>`;
+  }
+  let monthSvg = "";
+  MONTHS.forEach((m,i) => {
+    monthSvg += `<text x="${xFor(i)}" y="${H-6}" text-anchor="middle" font-size="10.5" font-family="Inter" fill="#5B6D6F">${m}</text>`;
+  });
+
+  let linesSvg = "";
+  visible.forEach(s => {
+    let d = "";
+    let started = false;
+    s.data.forEach((v,i) => {
+      if(v == null){ started = false; return; }
+      const cmd = started ? "L" : "M";
+      d += `${cmd}${xFor(i).toFixed(1)},${yFor(v).toFixed(1)} `;
+      started = true;
+    });
+    linesSvg += `<path class="chart-line" d="${d}" stroke="${s.color.border}" stroke-width="${s.color.width}"/>`;
+    s.data.forEach((v,i) => {
+      if(v == null) return;
+      const showDot = s.color.width >= 3; // current year gets visible points
+      linesSvg += `<circle class="chart-point" cx="${xFor(i).toFixed(1)}" cy="${yFor(v).toFixed(1)}" r="${showDot?3:2.5}" fill="${s.color.border}" opacity="${showDot?1:0}"><title>${s.year} ${MONTHS[i]}: ${v.toLocaleString()}</title></circle>`;
+    });
+  });
+
+  svgEl.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  svgEl.innerHTML = gridSvg + monthSvg + linesSvg;
+
+  // legend, oldest to newest, clickable to toggle
+  legendEl.innerHTML = "";
+  series.forEach(s => {
+    const chip = document.createElement("span");
+    chip.className = "legend-chip" + (hiddenSet.has(s.year) ? " off" : "");
+    chip.innerHTML = `<span class="swatch" style="background:${s.color.border}"></span>${s.year}`;
+    chip.onclick = () => {
+      if(hiddenSet.has(s.year)) hiddenSet.delete(s.year); else hiddenSet.add(s.year);
+      drawLineChart(svgEl, legendEl, series, hiddenSet, chartKey);
+    };
+    legendEl.appendChild(chip);
+  });
+}
+
+function renderCharts(key){
+  const label = PROGRAM_TYPES.find(p=>p.key===key).label;
+  document.getElementById("regChartTitle").textContent = `${label} — Registrations`;
+  document.getElementById("progChartTitle").textContent = `${label} — Programs`;
+
+  drawLineChart(
+    document.getElementById("regChart"), document.getElementById("regLegend"),
+    buildSeries(key, "registrations"), chartHidden.reg, "reg"
+  );
+  drawLineChart(
+    document.getElementById("progChart"), document.getElementById("progLegend"),
+    buildSeries(key, "programs"), chartHidden.prog, "prog"
+  );
+}
+
+/* ---------- table ---------- */
+function renderTable(key, metric){
+  const yearData = DATA[key];
+  const years = Object.keys(yearData).map(Number).sort((a,b)=>a-b);
+  const label = PROGRAM_TYPES.find(p=>p.key===key).label;
+  document.getElementById("tableTitle").textContent = `Monthly detail — ${metric === "registrations" ? "Registrations" : "Programs"} (${label})`;
+
+  const headRow = document.getElementById("tableHeadRow");
+  headRow.innerHTML = "<th>Month</th>" + years.map(y=>`<th>${y}</th>`).join("") + "<th>Total</th>";
+
+  const bodyEl = document.getElementById("tableBody");
+  bodyEl.innerHTML = "";
+  const monthTotals = new Array(12).fill(0);
+  const yearTotals = {};
+  years.forEach(y => yearTotals[y] = 0);
+
+  for(let m = 0; m < 12; m++){
+    const tr = document.createElement("tr");
+    let row = `<td>${MONTHS[m]}</td>`;
+    let rowTotal = 0;
+    years.forEach(y=>{
+      const v = yearData[y][metric][m];
+      row += `<td>${v == null ? "—" : v.toLocaleString()}</td>`;
+      if(v != null){ rowTotal += v; monthTotals[m] += v; yearTotals[y] += v; }
+    });
+    row += `<td style="font-weight:600;color:var(--navy);">${rowTotal.toLocaleString()}</td>`;
+    tr.innerHTML = row;
+    bodyEl.appendChild(tr);
+  }
+
+  const footEl = document.getElementById("tableFootRow");
+  let grand = 0;
+  let footRow = "<td>Total</td>";
+  years.forEach(y=>{ footRow += `<td>${yearTotals[y].toLocaleString()}</td>`; grand += yearTotals[y]; });
+  footRow += `<td>${grand.toLocaleString()}</td>`;
+  footEl.innerHTML = footRow;
+}
+
+/* ---------- wiring ---------- */
+document.getElementById("btnReg").onclick = () => { activeMetric = "registrations"; updateToggle(); renderTable(activeType, activeMetric); };
+document.getElementById("btnProg").onclick = () => { activeMetric = "programs"; updateToggle(); renderTable(activeType, activeMetric); };
+function updateToggle(){
+  document.getElementById("btnReg").classList.toggle("active", activeMetric==="registrations");
+  document.getElementById("btnProg").classList.toggle("active", activeMetric==="programs");
+}
+
+function render(){
+  renderTypeGrid();
+  renderKPIs(activeType);
+  renderCharts(activeType);
+  renderTable(activeType, activeMetric);
+}
+
+loadData().catch(err => {
+  if(typeof console !== "undefined" && console.error) console.error("Dashboard failed to initialize:", err);
+  setAsOf(`<strong style="color:#B85C3E;">Dashboard failed to load</strong>${err.message} — check the browser console`);
+});
+</script>
+</body>
+</html>
