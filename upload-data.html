@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Update Try Tennis NC Dashboard Data</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#16323F;
+    --court:#2C6E7F;
+    --chalk:#F6F5F0;
+    --panel:#FFFFFF;
+    --line:#DDE2E1;
+    --ink:#1B2B2E;
+    --ink-soft:#5B6D6F;
+    --ball:#C7D93B;
+    --ball-deep:#98A62A;
+    --up:#3F8A5B;
+    --down:#B85C3E;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--chalk);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:720px;margin:0 auto;padding:40px 24px 80px;}
+
+  header{margin-bottom:28px;}
+  header h1{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:700;
+    font-size:24px;
+    margin:0 0 6px;
+    color:var(--navy);
+  }
+  header p{margin:0;color:var(--ink-soft);font-size:14.5px;max-width:56ch;line-height:1.5;}
+  a.back-link{font-size:13px;color:var(--court);text-decoration:none;font-weight:600;}
+  a.back-link:hover{text-decoration:underline;}
+
+  .steps{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:18px 20px;
+    margin-bottom:26px;
+  }
+  .steps ol{margin:0;padding-left:20px;}
+  .steps li{margin-bottom:6px;font-size:14px;line-height:1.5;}
+  .steps li:last-child{margin-bottom:0;}
+
+  .dropzone{
+    background:var(--panel);
+    border:2px dashed var(--line);
+    border-radius:var(--radius);
+    padding:44px 24px;
+    text-align:center;
+    cursor:pointer;
+    transition:border-color .15s, background .15s;
+  }
+  .dropzone.drag-over{border-color:var(--court);background:#F1F6F5;}
+  .dropzone .icon{font-size:32px;margin-bottom:10px;}
+  .dropzone .primary{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:600;
+    font-size:16px;
+    color:var(--navy);
+    margin-bottom:4px;
+  }
+  .dropzone .secondary{font-size:13px;color:var(--ink-soft);}
+  .dropzone input[type=file]{display:none;}
+
+  .status{
+    margin-top:18px;
+    font-size:13.5px;
+    color:var(--ink-soft);
+    display:none;
+  }
+  .status.show{display:block;}
+
+  .result{display:none;margin-top:22px;}
+  .result.show{display:block;}
+
+  .summary-card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:20px 22px;
+    margin-bottom:14px;
+  }
+  .summary-card h2{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:15px;
+    font-weight:600;
+    margin:0 0 12px;
+    color:var(--navy);
+  }
+  .summary-row{
+    display:flex;
+    justify-content:space-between;
+    font-size:13.5px;
+    padding:6px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .summary-row:last-child{border-bottom:none;}
+  .summary-row .label{color:var(--ink-soft);}
+  .summary-row .value{font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums;}
+
+  .flag-list{
+    background:#FBF6EC;
+    border:1px solid #E9DDBB;
+    border-radius:var(--radius);
+    padding:14px 18px;
+    margin-bottom:14px;
+    font-size:13px;
+  }
+  .flag-list .flag-title{font-weight:600;color:var(--navy);margin-bottom:6px;}
+  .flag-list ul{margin:0;padding-left:18px;}
+  .flag-list li{margin-bottom:2px;color:var(--ink-soft);}
+
+  .download-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    background:var(--navy);
+    color:#fff;
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:600;
+    font-size:14.5px;
+    padding:12px 22px;
+    border-radius:999px;
+    border:none;
+    cursor:pointer;
+    text-decoration:none;
+  }
+  .download-btn:hover{background:var(--court);}
+
+  .next-step{
+    font-size:13.5px;
+    color:var(--ink-soft);
+    margin-top:14px;
+    line-height:1.6;
+  }
+
+  .error-box{
+    background:#FBEDE7;
+    border:1px solid #E8C4B4;
+    border-radius:var(--radius);
+    padding:14px 18px;
+    font-size:13.5px;
+    color:var(--down);
+    margin-top:18px;
+    display:none;
+  }
+  .error-box.show{display:block;}
+
+  .success-box{
+    background:#EFF6F1;
+    border:1px solid #BFE0CB;
+    border-radius:var(--radius);
+    padding:16px 20px;
+    font-size:14px;
+    color:var(--up);
+    margin-top:18px;
+    display:none;
+    font-weight:600;
+  }
+  .success-box.show{display:block;}
+
+  .push-btn[disabled]{opacity:0.6;cursor:default;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="back-link" href="try-tennis-dashboard.html">&larr; Back to dashboard</a>
+    <h1 style="margin-top:10px;">Update Dashboard Data</h1>
+    <p>Drop in the monthly Serve Tennis coaching export below and this page will sort, classify, and merge it into the dashboard's data automatically — no spreadsheet work required.</p>
+  </header>
+
+  <div class="steps">
+    <ol>
+      <li>Export the coaching report from Serve Tennis as a CSV (same file you'd normally send along).</li>
+      <li>Drop that file below, or click to browse for it.</li>
+      <li>Review the summary that appears, then click <strong>Send to dashboard</strong>.</li>
+      <li>That's it — the dashboard updates immediately, no re-upload needed.</li>
+    </ol>
+  </div>
+
+  <div class="dropzone" id="dropzone">
+    <div class="icon">📄</div>
+    <div class="primary">Drop your Serve Tennis export here</div>
+    <div class="secondary">or click to choose a file — .csv only</div>
+    <input type="file" id="fileInput" accept=".csv">
+  </div>
+
+  <div class="status" id="status">Processing…</div>
+  <div class="error-box" id="errorBox"></div>
+
+  <div class="result" id="result">
+    <div class="summary-card">
+      <h2 id="summaryTitle">Ready to send</h2>
+      <div id="summaryRows"></div>
+    </div>
+    <div class="flag-list" id="flagList" style="display:none;"></div>
+    <button class="download-btn" id="pushBtn">Send to dashboard</button>
+    <div class="next-step" id="nextStep">This will update the live numbers on the dashboard immediately.</div>
+  </div>
+  <div class="success-box" id="successBox"></div>
+</div>
+
+<script>
+const SUPABASE_URL = "https://uwfmtdgdzamzaevdvjxu.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_HPLz5jQBQFzNE7TxFY2PrA_RiIlvYzU";
+
+/* ---------- config — keep in sync with the dashboard and process_serve_tennis_export.py ---------- */
+const REG_COLUMN = "Active Participants";
+const CANCELLED_THRESHOLD = 2;
+const VALID_KEYS = new Set(["adult_tt", "junior_tt", "adult_tp", "adult_tm"]);
+const PATHWAY_PATTERNS = [
+  { re: /try match/i, code: "tm" },
+  { re: /try play/i,  code: "tp" },
+  { re: /try tennis/i, code: "tt" },
+];
+const TYPE_LABELS = {
+  adult_tt: "Adult Try Tennis", junior_tt: "Junior Try Tennis",
+  adult_tp: "Adult Try Play", adult_tm: "Adult Try Match",
+};
+
+/* ---------- small robust CSV parser (handles quoted fields with commas) ---------- */
+function parseCSV(text){
+  const rows = [];
+  let row = [], field = "", inQuotes = false;
+  for(let i = 0; i < text.length; i++){
+    const c = text[i], next = text[i+1];
+    if(inQuotes){
+      if(c === '"' && next === '"'){ field += '"'; i++; }
+      else if(c === '"'){ inQuotes = false; }
+      else { field += c; }
+    } else {
+      if(c === '"'){ inQuotes = true; }
+      else if(c === ','){ row.push(field); field = ""; }
+      else if(c === '\r'){ /* skip */ }
+      else if(c === '\n'){ row.push(field); rows.push(row); row = []; field = ""; }
+      else { field += c; }
+    }
+  }
+  if(field.length || row.length){ row.push(field); rows.push(row); }
+  if(!rows.length) return [];
+  const headers = rows[0];
+  return rows.slice(1).filter(r => r.length > 1 || r[0] !== "").map(r => {
+    const obj = {};
+    headers.forEach((h,i) => obj[h] = r[i] !== undefined ? r[i] : "");
+    return obj;
+  });
+}
+
+function classify(category, typeCol){
+  category = category || "";
+  let pathway = null;
+  for(const p of PATHWAY_PATTERNS){ if(p.re.test(category)){ pathway = p.code; break; } }
+  if(!pathway) return null;
+
+  let age;
+  if(/junior/i.test(category)) age = "junior";
+  else if(/adult/i.test(category)) age = "adult";
+  else {
+    age = (typeCol || "").trim().toLowerCase();
+    if(age !== "adult" && age !== "junior") return null;
+  }
+  return `${age}_${pathway}`;
+}
+
+/* ---------- process one uploaded export into aggregated rows ---------- */
+function processExport(rows){
+  const agg = {}; // "type|year|month" -> {programs, registrations}
+  let droppedCancelled = 0, droppedLowParticipation = 0;
+  const unmatchedCategories = new Set();
+  const outsideScope = new Set();
+
+  rows.forEach(r => {
+    const status = (r["Status"] || "").trim().toLowerCase();
+    const reg = parseFloat(r[REG_COLUMN]) || 0;
+    const statusCancelled = status === "cancelled";
+    const lowParticipation = !statusCancelled && reg <= CANCELLED_THRESHOLD;
+    if(statusCancelled){ droppedCancelled++; return; }
+    if(lowParticipation){ droppedLowParticipation++; return; }
+
+    const key = classify(r["Category"], r["Type"]);
+    if(!key){ if(r["Category"]) unmatchedCategories.add(r["Category"]); return; }
+    if(!VALID_KEYS.has(key)){ outsideScope.add(`${key} (from "${r["Category"]}")`); return; }
+
+    const startDate = (r["Start Date"] || "").trim();
+    const parts = startDate.split("/");
+    if(parts.length !== 3) return;
+    const month = parseInt(parts[0], 10);
+    const year = parseInt(parts[2], 10);
+    if(!month || !year || month < 1 || month > 12) return;
+
+    const gkey = `${key}|${year}|${month}`;
+    if(!agg[gkey]) agg[gkey] = { type_key:key, year, month, programs:0, registrations:0 };
+    agg[gkey].programs += 1;
+    agg[gkey].registrations += reg;
+  });
+
+  return {
+    rows: Object.values(agg),
+    droppedCancelled, droppedLowParticipation,
+    unmatchedCategories: [...unmatchedCategories],
+    outsideScope: [...outsideScope],
+  };
+}
+
+/* ---------- push aggregated rows to Supabase (upsert on type_key/year/month) ---------- */
+async function pushToSupabase(rows){
+  if(SUPABASE_URL.includes("YOUR-PROJECT") || SUPABASE_ANON_KEY.includes("YOUR-ANON")){
+    throw new Error("This page isn't connected to a database yet — SUPABASE_URL and SUPABASE_ANON_KEY need to be filled in first.");
+  }
+  const payload = rows.map(r => ({
+    type_key: r.type_key, year: r.year, month: r.month,
+    programs: r.programs, registrations: r.registrations,
+  }));
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/program_data?on_conflict=type_key,year,month`, {
+    method: "POST",
+    headers: {
+      "apikey": SUPABASE_ANON_KEY,
+      "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+      "Content-Type": "application/json",
+      "Prefer": "resolution=merge-duplicates",
+    },
+    body: JSON.stringify(payload),
+  });
+  if(!res.ok){
+    const detail = await res.text().catch(()=>"");
+    throw new Error(`Database rejected the update (${res.status}). ${detail.slice(0,200)}`);
+  }
+}
+
+/* ---------- wiring ---------- */
+const dropzone = document.getElementById("dropzone");
+const fileInput = document.getElementById("fileInput");
+const statusEl = document.getElementById("status");
+const errorBox = document.getElementById("errorBox");
+const resultEl = document.getElementById("result");
+const summaryRows = document.getElementById("summaryRows");
+const flagList = document.getElementById("flagList");
+const pushBtn = document.getElementById("pushBtn");
+const nextStep = document.getElementById("nextStep");
+const successBox = document.getElementById("successBox");
+
+let pendingRows = null;
+
+function showError(msg){
+  errorBox.textContent = msg;
+  errorBox.classList.add("show");
+}
+function clearError(){ errorBox.classList.remove("show"); errorBox.textContent = ""; }
+
+async function handleFile(file){
+  clearError();
+  resultEl.classList.remove("show");
+  successBox.classList.remove("show");
+  statusEl.classList.add("show");
+  statusEl.textContent = "Processing the export…";
+
+  const text = await file.text();
+  const rows = parseCSV(text);
+  if(!rows.length){
+    statusEl.classList.remove("show");
+    showError("Couldn't read any rows from that file. Make sure it's the CSV export from Serve Tennis.");
+    return;
+  }
+
+  const processed = processExport(rows);
+  pendingRows = processed.rows;
+  statusEl.classList.remove("show");
+
+  const totalPrograms = processed.rows.reduce((a,r)=>a+r.programs, 0);
+  const totalRegs = processed.rows.reduce((a,r)=>a+r.registrations, 0);
+  const typesTouched = [...new Set(processed.rows.map(r=>r.type_key))].map(k => TYPE_LABELS[k] || k);
+  const monthsTouched = [...new Set(processed.rows.map(r=>`${r.year}-${String(r.month).padStart(2,"0")}`))].sort();
+
+  summaryRows.innerHTML = `
+    <div class="summary-row"><span class="label">Programs found in this file</span><span class="value">${totalPrograms.toLocaleString()}</span></div>
+    <div class="summary-row"><span class="label">Total registrations</span><span class="value">${totalRegs.toLocaleString()}</span></div>
+    <div class="summary-row"><span class="label">Program types included</span><span class="value">${typesTouched.join(", ") || "none"}</span></div>
+    <div class="summary-row"><span class="label">Months covered</span><span class="value">${monthsTouched.join(", ") || "none"}</span></div>
+    <div class="summary-row"><span class="label">Rows excluded (cancelled)</span><span class="value">${processed.droppedCancelled}</span></div>
+    <div class="summary-row"><span class="label">Rows excluded (${CANCELLED_THRESHOLD} or fewer participants)</span><span class="value">${processed.droppedLowParticipation}</span></div>
+  `;
+
+  const flags = [];
+  if(processed.unmatchedCategories.length){
+    flags.push(`<div class="flag-title">Rows skipped — not a Try Tennis/Play/Match program</div><ul>${processed.unmatchedCategories.map(c=>`<li>${c}</li>`).join("")}</ul>`);
+  }
+  if(processed.outsideScope.length){
+    flags.push(`<div class="flag-title">Rows skipped — program type not yet tracked on the dashboard</div><ul>${processed.outsideScope.map(c=>`<li>${c}</li>`).join("")}</ul>`);
+  }
+  if(flags.length){
+    flagList.innerHTML = flags.join('<div style="height:10px;"></div>');
+    flagList.style.display = "block";
+  } else {
+    flagList.style.display = "none";
+  }
+
+  pushBtn.disabled = false;
+  pushBtn.textContent = "Send to dashboard";
+  nextStep.textContent = "This will update the live numbers on the dashboard immediately.";
+  resultEl.classList.add("show");
+}
+
+pushBtn.onclick = async () => {
+  if(!pendingRows || !pendingRows.length) return;
+  pushBtn.disabled = true;
+  pushBtn.textContent = "Sending…";
+  clearError();
+  try{
+    await pushToSupabase(pendingRows);
+    successBox.textContent = `Done — ${pendingRows.length} month/program row(s) sent. The dashboard now reflects this data.`;
+    successBox.classList.add("show");
+    resultEl.classList.remove("show");
+    pendingRows = null;
+  } catch(err){
+    showError(err.message);
+    pushBtn.disabled = false;
+    pushBtn.textContent = "Send to dashboard";
+  }
+};
+
+dropzone.onclick = () => fileInput.click();
+fileInput.onchange = () => { if(fileInput.files[0]) handleFile(fileInput.files[0]); };
+
+["dragenter","dragover"].forEach(evt => {
+  dropzone.addEventListener(evt, e => { e.preventDefault(); dropzone.classList.add("drag-over"); });
+});
+["dragleave","drop"].forEach(evt => {
+  dropzone.addEventListener(evt, e => { e.preventDefault(); dropzone.classList.remove("drag-over"); });
+});
+dropzone.addEventListener("drop", e => {
+  const file = e.dataTransfer.files[0];
+  if(file) handleFile(file);
+});
+</script>
+</body>
+</html>
