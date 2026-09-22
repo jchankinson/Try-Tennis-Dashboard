@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Try Tennis NC — Program Dashboard (Sample Layout)</title>
+<title>Try Tennis NC — Program Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -307,13 +307,17 @@
   <header class="page">
     <div>
       <h1>Try Tennis NC — Program Dashboard</h1>
-      <p>Monthly programs and registrations by pathway, 2017 to present. Sample layout with illustrative data.</p>
+      <p>Monthly programs and registrations by pathway, 2024 to present.</p>
     </div>
     <div class="as-of" id="asOf">
       <strong>Loading data…</strong>
       &nbsp;
     </div>
   </header>
+
+  <div style="text-align:right;margin:-14px 0 22px;">
+    <a href="upload-data.html" style="font-size:12.5px;color:var(--court-deep);font-weight:600;text-decoration:none;">Update monthly data &rarr;</a>
+  </div>
 
   <div class="section-title" style="margin-bottom:4px;">Program types</div>
   <div class="section-note">Click a card to open its detail below — charts, and monthly table.</div>
@@ -362,18 +366,21 @@
   </div>
 
   <footer>
-    Sample layout only — replace the mock dataset with your 2017–present export. Each program type (Adult Try Tennis, Junior Try Tennis, Adult Try Play, Adult Try Match) uses this same card, chart, and table pattern so the audience only has to learn the layout once.
+    Each program type (Adult Try Tennis, Junior Try Tennis, Adult Try Play, Adult Try Match) uses this same card, chart, and table pattern so the audience only has to learn the layout once.
   </footer>
 
 </div>
 
 <script>
 /* ---------- data source ---------- */
-// Point this at your published data. Two options:
-//  1) A CSV sitting next to this HTML file (e.g. exported from
-//     process_serve_tennis_export.py) — the default below.
-//  2) A Google Sheet published as CSV: File > Share > Publish to web > CSV,
-//     then paste that URL here instead.
+// Primary source: a Supabase table that upload-data.html pushes into.
+// Fill these in from your Supabase project's API settings once it's set up
+// (Project Settings > API > Project URL / anon public key).
+const SUPABASE_URL = "https://uwfmtdgdzamzaevdvjxu.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_HPLz5jQBQFzNE7TxFY2PrA_RiIlvYzU";
+
+// Fallback if Supabase isn't reachable/configured: a CSV sitting next to
+// this HTML file (e.g. exported from process_serve_tennis_export.py).
 // Expected columns: type_key,year,month,programs,registrations
 // type_key values: adult_tt, junior_tt, adult_tp, adult_tm
 const CSV_URL = "master_program_data.csv";
@@ -586,14 +593,33 @@ async function loadData(){
   const embedded = parseCSV(EMBEDDED_CSV);
   applyParsed(embedded.data, "Embedded copy, updated with each export");
 
-  // then try to override with a live CSV, if one is reachable
+  // try the live Supabase table first (what upload-data.html writes to)
+  const supabaseConfigured = !SUPABASE_URL.includes("YOUR-PROJECT") && !SUPABASE_ANON_KEY.includes("YOUR-ANON");
+  if(supabaseConfigured){
+    try{
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/program_data?select=type_key,year,month,programs,registrations`, {
+        headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${SUPABASE_ANON_KEY}` },
+        cache: "no-store",
+      });
+      if(!res.ok) throw new Error(`fetch failed: ${res.status}`);
+      const json = await res.json();
+      if(!json || !json.length) throw new Error("table is empty");
+      applyParsed(json, "Live — from Supabase");
+      render();
+      return;
+    } catch(err){
+      if(typeof console !== "undefined" && console.log) console.log("Supabase not reachable, trying CSV fallback:", err.message);
+    }
+  }
+
+  // fallback: a CSV sitting alongside this file
   try{
     const res = await fetch(CSV_URL, { cache: "no-store" });
     if(!res.ok) throw new Error(`fetch failed: ${res.status}`);
     const text = await res.text();
     const parsed = parseCSV(text);
     if(!parsed.data || !parsed.data.length) throw new Error("empty CSV");
-    applyParsed(parsed.data, ``);
+    applyParsed(parsed.data, `Live — from ${CSV_URL}`);
   } catch(err){
     if(typeof console !== "undefined" && console.log) console.log("No live CSV reachable, using embedded data:", err.message);
   }
